@@ -6,23 +6,22 @@ import * as chokidar from 'chokidar';
 import * as Color from 'color';
 import template from './template';
 
-const walCachePath = path.join(os.homedir(), '.cache', 'wal');
-const walColorsPath = path.join(walCachePath, 'colors');
-const walColorsJsonPath = path.join(walCachePath, 'colors.json');
+const wallustCachePath = path.join(os.homedir(), '.cache', 'wallust');
+const wallustColorsPath = path.join(wallustCachePath, 'colors');
+const wallustColorsJsonPath = path.join(wallustCachePath, 'colors.json');
 let autoUpdateWatcher: chokidar.FSWatcher | null = null;
-
 
 export function activate(context: vscode.ExtensionContext) {
 
 	// Register the update command
-	let disposable = vscode.commands.registerCommand('walTheme.update', generateColorThemes);
+	let disposable = vscode.commands.registerCommand('wallustTheme.update', generateColorThemes);
 	context.subscriptions.push(disposable);
 
 	// Start the auto update if enabled
-	if(vscode.workspace.getConfiguration().get('walTheme.autoUpdate')) {
+	if(vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate')) {
 		/*
 		 * Update theme at startup
-		 * Needed for when wal palette updates while vscode isn't running.
+		 * Needed for when wallust palette updates while vscode isn't running.
 		 * The timeout is required to overcome a limitation of vscode which
 		 * breaks the theme auto-update if updated too early at startup.
 		 */
@@ -33,8 +32,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Toggle the auto update in real time when changing the extension configuration
 	vscode.workspace.onDidChangeConfiguration(event => {
-		if(event.affectsConfiguration('walTheme.autoUpdate')) {
-			if(vscode.workspace.getConfiguration().get('walTheme.autoUpdate')) {
+		if(event.affectsConfiguration('wallustTheme.autoUpdate')) {
+			if(vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate')) {
 				if(autoUpdateWatcher === null) {
 					autoUpdateWatcher = autoUpdate();
 				}
@@ -54,7 +53,6 @@ export function deactivate() {
 	if(autoUpdateWatcher !== null) {
 		autoUpdateWatcher.close();
 	}
-
 }
 
 
@@ -62,24 +60,24 @@ export function deactivate() {
  * Generates the theme from the current color palette and overwrites the last one
  */
 function generateColorThemes() {
-	// Import colors from pywal cache
+	// Import colors from wallust cache
 	let colors: Color[] | undefined;
 	try {
-		colors = fs.readFileSync(walColorsPath)
+		colors = fs.readFileSync(wallustColorsPath)
 										 .toString()
 										 .split(/\s+/, 16)
 			.map(hex => Color(hex));
-		
-		if (fs.existsSync(walColorsJsonPath)) {
-			type WalJson = {
+
+		if (fs.existsSync(wallustColorsJsonPath)) {
+			type WallustJson = {
 				special: {
 					background: string,
 					foreground: string
 				}
 			};
 
-			let colorsJson: WalJson;
-			const colorsRaw = fs.readFileSync(walColorsJsonPath).toString();
+			let colorsJson: WallustJson;
+			const colorsRaw = fs.readFileSync(wallustColorsJsonPath).toString();
 
 			try {
 				colorsJson = JSON.parse(colorsRaw);
@@ -96,22 +94,22 @@ function generateColorThemes() {
 			colors[7] = Color(colorsJson?.special?.foreground);
 		}
 	} catch(error) {
-		// Not a complete failure if we have colors from the wal colors file, but failed to load from the colors.json
+		// Not a complete failure if we have colors from the wallust colors file, but failed to load from the colors.json
 		if (colors === undefined || colors.length === 0) {
-			vscode.window.showErrorMessage('Couldn\'t load colors from pywal cache, be sure to run pywal before updating.');
+			vscode.window.showErrorMessage('Couldn\'t load colors from wallust cache, be sure to run wallust before updating.');
 			return;
 		}
 
-		vscode.window.showWarningMessage('Couldn\'t load all colors from pywal cache');
+		vscode.window.showWarningMessage('Couldn\'t load all colors from wallust cache');
 	}
-		
+
 	// Generate the normal theme
 	const colorTheme = template(colors, false);
-	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wal.json'), JSON.stringify(colorTheme, null, 4));
-	
+	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wallust.json'), JSON.stringify(colorTheme, null, 4));
+
 	// Generate the bordered theme
 	const colorThemeBordered = template(colors, true);
-	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wal-bordered.json'), JSON.stringify(colorThemeBordered, null, 4));
+	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wallust-bordered.json'), JSON.stringify(colorThemeBordered, null, 4));
 }
 
 /**
@@ -119,8 +117,8 @@ function generateColorThemes() {
  * @returns The watcher for the color palette
  */
 function autoUpdate(): chokidar.FSWatcher {
-	// Watch for changes in the color palette of wal
+	// Watch for changes in the color palette of wallust
 	return chokidar
-		.watch(walCachePath)
+		.watch(wallustCachePath)
 		.on('change', generateColorThemes);
 }

@@ -1,19 +1,19 @@
 {
-	"name": "wal-theme",
-	"displayName": "Wal Theme",
-	"description": "A theme generated with pywal color palette",
-	"publisher": "dlasagno",
-	"author": "Daniele Lasagno",
+	"name": "wallust-theme",
+	"displayName": "Wallust Theme",
+	"description": "A theme generated with wallust color palette",
+	"publisher": "saatvik333",
+	"author": "Saatvik Sharma",
 	"license": "MIT",
-	"version": "1.2.0",
+	"version": "1.0.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dlasagno/vscode-wal-theme"
+		"url": "https://github.com/saatvik333/vscode-wallust-theme"
 	},
 	"bugs": {
-		"url": "https://github.com/dlasagno/vscode-wal-theme/issues"
+		"url": "https://github.com/saatvik333/vscode-wallust-theme/issues"
 	},
-	"homepage": "https://github.com/dlasagno/vscode-wal-theme#readme",
+	"homepage": "https://github.com/saatvik333/vscode-wallust-theme#readme",
 	"engines": {
 		"vscode": "^1.34.0"
 	},
@@ -26,44 +26,43 @@
 	],
 	"keywords": [
 		"theme",
-		"pywal",
-		"wal"
+		"wallust"
 	],
 	"icon": "icon.png",
 	"activationEvents": [
 		"*",
-		"onCommand:walTheme.update"
+		"onCommand:wallustTheme.update"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "walTheme.update",
+				"command": "wallustTheme.update",
 				"title": "Update",
-				"category": "Wal Theme"
+				"category": "Wallust Theme"
 			}
 		],
 		"configuration": {
-			"title": "Wal Theme",
+			"title": "Wallust Theme",
 			"properties": {
-				"walTheme.autoUpdate": {
+				"wallustTheme.autoUpdate": {
 					"type": "boolean",
 					"default": true,
-					"description": "Update automatically the theme when the pywal color palette changes"
+					"description": "Update automatically the theme when the wallust color palette changes"
 				}
 			}
 		},
 		"themes": [
 			{
-				"label": "Wal",
+				"label": "Wallust",
 				"uiTheme": "vs-dark",
-				"path": "./themes/wal.json",
+				"path": "./themes/wallust.json",
 				"_watch": true
 			},
 			{
-				"label": "Wal Bordered",
+				"label": "Wallust Bordered",
 				"uiTheme": "vs-dark",
-				"path": "./themes/wal-bordered.json",
+				"path": "./themes/wallust-bordered.json",
 				"_watch": true
 			}
 		]
