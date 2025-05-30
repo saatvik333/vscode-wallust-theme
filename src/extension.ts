@@ -6,119 +6,176 @@ import * as chokidar from 'chokidar';
 import * as Color from 'color';
 import template from './template';
 
-const wallustCachePath = path.join(os.homedir(), '.cache', 'wallust');
-const wallustColorsPath = path.join(wallustCachePath, 'colors');
-const wallustColorsJsonPath = path.join(wallustCachePath, 'colors.json');
+// Constants
+const CACHE_DIR = '.cache/wallust';
+const COLORS_FILE = 'colors';
+const COLORS_JSON_FILE = 'colors.json';
+const THEMES_DIR = path.join(__dirname, '..', 'themes');
+
+const wallustCachePath = path.join(os.homedir(), CACHE_DIR);
+const wallustColorsPath = path.join(wallustCachePath, COLORS_FILE);
+const wallustColorsJsonPath = path.join(wallustCachePath, COLORS_JSON_FILE);
+
 let autoUpdateWatcher: chokidar.FSWatcher | null = null;
+let debounceTimer: NodeJS.Timeout | null = null;
+const debounceDelay = 300; // ms
 
 export function activate(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+        vscode.commands.registerCommand('wallustTheme.update', generateColorThemes)
+    );
 
-	// Register the update command
-	let disposable = vscode.commands.registerCommand('wallustTheme.update', generateColorThemes);
-	context.subscriptions.push(disposable);
-
-	// Start the auto update if enabled
-	if(vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate')) {
-		/*
-		 * Update theme at startup
-		 * Needed for when wallust palette updates while vscode isn't running.
-		 * The timeout is required to overcome a limitation of vscode which
-		 * breaks the theme auto-update if updated too early at startup.
-		 */
-		setTimeout(generateColorThemes, 10000);
-
-		autoUpdateWatcher = autoUpdate();
-	}
-
-	// Toggle the auto update in real time when changing the extension configuration
-	vscode.workspace.onDidChangeConfiguration(event => {
-		if(event.affectsConfiguration('wallustTheme.autoUpdate')) {
-			if(vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate')) {
-				if(autoUpdateWatcher === null) {
-					autoUpdateWatcher = autoUpdate();
-				}
-			}
-			else if(autoUpdateWatcher !== null) {
-				autoUpdateWatcher.close();
-				autoUpdateWatcher = null;
-			}
-		}
-	});
-
+    initializeAutoUpdate();
+    setupConfigurationListener();
 }
 
 export function deactivate() {
-
-	// Close the watcher if active
-	if(autoUpdateWatcher !== null) {
-		autoUpdateWatcher.close();
-	}
+    autoUpdateWatcher?.close();
+    if (debounceTimer) clearTimeout(debounceTimer);
 }
 
+function initializeAutoUpdate() {
+    if (vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate')) {
+        setTimeout(generateColorThemes, 10000);
+        autoUpdateWatcher = createAutoUpdateWatcher();
+    }
+}
 
-/**
- * Generates the theme from the current color palette and overwrites the last one
- */
+function setupConfigurationListener() {
+    vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration('wallustTheme.autoUpdate')) {
+            handleAutoUpdateConfigChange();
+        }
+    });
+}
+
+function handleAutoUpdateConfigChange() {
+    const shouldEnable = vscode.workspace.getConfiguration().get('wallustTheme.autoUpdate');
+
+    if (shouldEnable && !autoUpdateWatcher) {
+        autoUpdateWatcher = createAutoUpdateWatcher();
+    } else if (!shouldEnable && autoUpdateWatcher) {
+        autoUpdateWatcher.close();
+        autoUpdateWatcher = null;
+    }
+}
+
+function createAutoUpdateWatcher(): chokidar.FSWatcher {
+    // Watch only specific files instead of entire directory
+    return chokidar.watch([wallustColorsPath, wallustColorsJsonPath], {
+        ignoreInitial: true,
+        persistent: true,
+        usePolling: false,
+        awaitWriteFinish: {
+            stabilityThreshold: 500,
+            pollInterval: 100
+        }
+    }).on('change', debouncedGenerateColorThemes);
+}
+
+function debouncedGenerateColorThemes() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        generateColorThemes();
+        debounceTimer = null;
+    }, debounceDelay);
+}
+
 function generateColorThemes() {
-	// Import colors from wallust cache
-	let colors: Color[] | undefined;
-	try {
-		colors = fs.readFileSync(wallustColorsPath)
-										 .toString()
-										 .split(/\s+/, 16)
-			.map(hex => Color(hex));
-
-		if (fs.existsSync(wallustColorsJsonPath)) {
-			type WallustJson = {
-				special: {
-					background: string,
-					foreground: string
-				}
-			};
-
-			let colorsJson: WallustJson;
-			const colorsRaw = fs.readFileSync(wallustColorsJsonPath).toString();
-
-			try {
-				colorsJson = JSON.parse(colorsRaw);
-			} catch {
-				// The wallpaper path on Windows can cause JSON.parse errors since the
-				// path isn't properly escaped.
-				colorsJson = JSON.parse(colorsRaw
-					.split('\n')
-					.filter((line) => !line.includes('wallpaper'))
-					.join('\n'));
-			}
-
-			colors[0] = Color(colorsJson?.special?.background);
-			colors[7] = Color(colorsJson?.special?.foreground);
-		}
-	} catch(error) {
-		// Not a complete failure if we have colors from the wallust colors file, but failed to load from the colors.json
-		if (colors === undefined || colors.length === 0) {
-			vscode.window.showErrorMessage('Couldn\'t load colors from wallust cache, be sure to run wallust before updating.');
-			return;
-		}
-
-		vscode.window.showWarningMessage('Couldn\'t load all colors from wallust cache');
-	}
-
-	// Generate the normal theme
-	const colorTheme = template(colors, false);
-	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wallust.json'), JSON.stringify(colorTheme, null, 4));
-
-	// Generate the bordered theme
-	const colorThemeBordered = template(colors, true);
-	fs.writeFileSync(path.join(__dirname,'..', 'themes', 'wallust-bordered.json'), JSON.stringify(colorThemeBordered, null, 4));
+    try {
+        const colors = loadColors();
+        writeThemeFiles(colors);
+    } catch (error) {
+        if (error instanceof Error) {
+            handleGenerationError(error);
+        } else {
+            handleGenerationError(new Error(String(error)));
+        }
+    }
 }
 
-/**
- * Automatically updates the theme when the color palette changes
- * @returns The watcher for the color palette
- */
-function autoUpdate(): chokidar.FSWatcher {
-	// Watch for changes in the color palette of wallust
-	return chokidar
-		.watch(wallustCachePath)
-		.on('change', generateColorThemes);
+function loadColors(): Color[] {
+    const colors = readBaseColors();
+    return colorsJsonExists() ? enhanceWithJsonColors(colors) : colors;
+}
+
+function readBaseColors(): Color[] {
+    if (!fs.existsSync(wallustColorsPath)) {
+        throw new Error('Wallust colors file not found. Run wallust first.');
+    }
+
+    const colorsData = fs.readFileSync(wallustColorsPath, 'utf-8');
+    return colorsData.split(/\s+/, 16).map(hex => Color(hex));
+}
+
+function colorsJsonExists(): boolean {
+    return fs.existsSync(wallustColorsJsonPath);
+}
+
+function enhanceWithJsonColors(colors: Color[]): Color[] {
+    try {
+        const jsonData = fs.readFileSync(wallustColorsJsonPath, 'utf-8');
+        const parsedData = parseColorJson(jsonData);
+
+        if (parsedData?.special?.background) {
+            colors[0] = Color(parsedData.special.background);
+        }
+        if (parsedData?.special?.foreground) {
+            colors[7] = Color(parsedData.special.foreground);
+        }
+    } catch (error) {
+        const message = (error instanceof Error) ? error.message : String(error);
+        vscode.window.showWarningMessage(
+            `Could not process colors.json: ${message}`
+        );
+    }
+    return colors;
+}
+
+function parseColorJson(jsonData: string): any {
+    try {
+        return JSON.parse(jsonData);
+    } catch {
+        // Fallback for Windows path escaping issues
+        return JSON.parse(
+            jsonData.split('\n')
+                .filter(line => !line.includes('wallpaper'))
+                .join('\n')
+        );
+    }
+}
+
+function writeThemeFiles(colors: Color[]) {
+    ensureThemesDirectoryExists();
+
+    const writeTheme = (fileName: string, bordered: boolean) => {
+        const themePath = path.join(THEMES_DIR, fileName);
+        const themeContent = JSON.stringify(template(colors, bordered), null, 4);
+        fs.writeFile(themePath, themeContent, handleWriteError);
+    };
+
+    writeTheme('wallust.json', false);
+    writeTheme('wallust-bordered.json', true);
+}
+
+function handleWriteError(err: NodeJS.ErrnoException | null) {
+    if (err) {
+        vscode.window.showErrorMessage(
+            `Failed to write theme file: ${err.message}`
+        );
+    }
+}
+
+function ensureThemesDirectoryExists() {
+    if (!fs.existsSync(THEMES_DIR)) {
+        fs.mkdirSync(THEMES_DIR, { recursive: true });
+    }
+}
+
+function handleGenerationError(error: Error) {
+    vscode.window.showErrorMessage(
+        error.message.startsWith('Wallust colors')
+            ? error.message
+            : `Theme generation failed: ${error.message}`
+    );
 }
