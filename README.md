@@ -1,4 +1,5 @@
 # Wallust Theme
+
 Visual Studio Code theme that syncs with your wallpaper palette in real time using wallust.
 
 | Visual Studio Code | Wallpaper |
