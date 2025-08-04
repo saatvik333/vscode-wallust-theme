@@ -1,16 +1,11 @@
 # Wallust Theme
+Visual Studio Code theme that syncs with your wallpaper palette in real time using wallust.
 
-Wallust Theme syncs your VS Code colors in real time with your current wallpaper palette, powered by [wallust](https://codeberg.org/explosion-mental/wallust).
-
-## Screenshots
->
-> **Note:** The blurred background of vscode in the screenshots reflect my personal compositor settings.
-
-| VS Code | Wallpaper |
+| Visual Studio Code | Wallpaper |
 |---------|-----------|
-| ![Vscode 1](./assets/code1.jpg) | ![Wallpaper 1](./assets/wal1.jpg) |
-| ![Vscode 2](./assets/code2.jpg) | ![Wallpaper 2](./assets/wal2.jpg) |
-| ![Vscode 3](./assets/code3.jpg) | ![Wallpaper 3](./assets/wal3.jpg) |
+| <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d2654042-4139-4da9-87b0-821dea7f63a9" /> | <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3c24f21b-546d-40fa-b1c5-34cc0529a79c" /> |
+| <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b2639a65-d5dc-45a7-bf1e-9999da9483cb" /> | <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/49ce64ad-ffcb-4214-b74b-0887a65cd8b5" /> |
+| <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ed947a01-7b10-4ca6-8b5b-12b93ff6e05d" /> | <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8c59ab8f-3327-4554-85ac-54d50dfea8af" /> |
 
 ## Features
 
