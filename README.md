@@ -20,7 +20,7 @@ Visual Studio Code theme that syncs with your wallpaper palette in real time usi
     This extension relies on wallust for generating color palettes. Ensure wallust is installed and properly configured.
 
 2. **Templates:**
-    Two wallust templates are required, available in the [assets/templates](./assets/templates) directory of this repository. These templates must be referenced in your wallust configuration.
+    Two wallust templates are required, available in the [templates](./templates) directory of this repository. These templates must be referenced in your wallust configuration.
 
 3. **Configure `wallust.toml`:**
     Add the following entries to your `wallust.toml` file to generate the necessary color files:
