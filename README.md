@@ -2,6 +2,15 @@
 
 Visual Studio Code theme that syncs with your wallpaper palette in real time using wallust.
 
+<div align="center">
+
+[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/saatvik333.wallust-theme?style=flat-square&label=VS+Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=saatvik333.wallust-theme)
+[![Open VSX](https://img.shields.io/open-vsx/v/saatvik333/wallust-theme?style=flat-square&label=Open+VSX&logo=eclipse-ide)](https://open-vsx.org/extension/saatvik333/wallust-theme)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/saatvik333.wallust-theme?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=saatvik333.wallust-theme)
+[![License](https://img.shields.io/github/license/saatvik333/vscode-wallust-theme?style=flat-square)](https://github.com/saatvik333/vscode-wallust-theme/blob/master/LICENSE)
+
+</div>
+
 ## Preview
 
 ![image1](https://github.com/user-attachments/assets/d2654042-4139-4da9-87b0-821dea7f63a9)
@@ -26,7 +35,7 @@ Visual Studio Code theme that syncs with your wallpaper palette in real time usi
    This extension relies on wallust for generating color palettes.
 
 2. **Copy templates:**
-   Copy the templates from the [templates](./templates) directory to your wallust templates folder.
+   Copy the templates from the [templates](./examples/wallust-templates/) directory to your wallust templates folder.
 
 3. **Configure `wallust.toml`:**
    Add these entries to generate the required color files:
@@ -78,7 +87,7 @@ The extension monitors `~/.cache/wallust/colors` and `~/.cache/wallust/colors.js
 
 ### Colors look wrong?
 
-1. Ensure your wallust templates match the ones in this repo's `templates/` folder
+1. Ensure your wallust templates match the ones in this repo's `examples/wallust-templates/` folder
 2. The `colors.json` file is optional but provides better background/foreground colors
 3. Try regenerating with `wallust run <your-wallpaper>`
 
@@ -100,5 +109,4 @@ The extension activates after VS Code startup completes. Check:
 
 ## Credits
 
-- **Special thanks** to [ComputerKeeda](https://github.com/ComputerKeeda) for their invaluable help in troubleshooting and improving this extension.
 - Inspired by the excellent work on [Wal Theme](https://github.com/dlasagno/vscode-wal-theme).

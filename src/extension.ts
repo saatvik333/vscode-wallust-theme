@@ -41,7 +41,7 @@ interface ThemeGenerationResult {
 // Constants
 // ============================================================================
 
-const EXTENSION_VERSION = '2.0.0';
+const EXTENSION_VERSION = '1.1.0';
 const CACHE_DIR = '.cache/wallust';
 const COLORS_FILE = 'colors';
 const COLORS_JSON_FILE = 'colors.json';
