@@ -10,7 +10,7 @@
     }
   ],
   "license": "MIT",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/saatvik333/vscode-wallust-theme"
@@ -34,14 +34,23 @@
     "wallust"
   ],
   "icon": "icon.png",
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "wallustTheme.update",
-        "title": "Update",
-        "category": "Wallust Theme"
+        "title": "Update Theme",
+        "category": "Wallust Theme",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "wallustTheme.clearCache",
+        "title": "Clear Cache",
+        "category": "Wallust Theme",
+        "icon": "$(trash)"
       }
     ],
     "configuration": {
@@ -50,7 +59,8 @@
         "wallustTheme.autoUpdate": {
           "type": "boolean",
           "default": true,
-          "description": "Update automatically the theme when the wallust color palette changes"
+          "description": "Automatically update theme when wallust color palette changes. Uses file watching with polling fallback.",
+          "scope": "application"
         }
       }
     },
@@ -85,7 +95,7 @@
     "@typescript-eslint/parser": "^4.28.3",
     "eslint": "^7.30.0",
     "glob": "^7.1.7",
-    "typescript": "^3.9.10"
+    "typescript": "^5.3.0"
   },
   "dependencies": {
     "chokidar": "^3.5.2",
