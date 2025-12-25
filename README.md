@@ -13,11 +13,9 @@ Visual Studio Code theme that syncs with your wallpaper palette in real time usi
 
 ## Preview
 
-![image1](https://github.com/user-attachments/assets/d2654042-4139-4da9-87b0-821dea7f63a9)
-
-![image2](https://github.com/user-attachments/assets/b2639a65-d5dc-45a7-bf1e-9999da9483cb)
-
-![image3](https://github.com/user-attachments/assets/ed947a01-7b10-4ca6-8b5b-12b93ff6e05d)
+![image1](https://github.com/user-attachments/assets/c4ba28b4-6e79-4c13-8654-5db53c43653d)
+![image2](https://github.com/user-attachments/assets/4505a2ec-dfff-4b65-b8a5-bed2a8207538)
+![image3](https://github.com/user-attachments/assets/fc2a92e0-6f57-4c95-8c6b-1c85eac999b3)
 
 ## Features
 
