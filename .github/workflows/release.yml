@@ -1,8 +1,9 @@
 name: Release Extension
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -14,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install Dependencies
         run: npm ci
@@ -22,10 +23,8 @@ jobs:
       - name: Compile
         run: npm run compile
 
-      - name: Publish to VS Code Marketplace
-        run: npx vsce publish -p ${{ secrets.VSCE_PAT }}
-        continue-on-error: true
+      - name: Package and Publish to VS Code Marketplace
+        run: npx vsce publish --packagePath . -p ${{ secrets.VSCE_PAT }}
 
       - name: Publish to Open VSX Registry
         run: npx ovsx publish -p ${{ secrets.OPENVSX_ACCESS_TOKEN }}
-        continue-on-error: true
