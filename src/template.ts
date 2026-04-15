@@ -360,6 +360,26 @@ export default (colors: Color[], bordered: boolean) => {
             'activityBarBadge.background': semantic.accent.hex(),
             'activityBarBadge.foreground': contrastFg.hex(),
 
+            // Activity Bar (Top position)
+            'activityBarTop.foreground': semantic.fg.hex(),
+            'activityBarTop.inactiveForeground': semantic.fgMuted.hex(),
+            'activityBarTop.activeForeground': semantic.fg.hex(),
+            'activityBarTop.background': (bordered ? semantic.bg : semantic.bgElevated).hex(),
+            'activityBarTop.border': bordered ? semantic.fgMuted.hex() + alpha.faint : semantic.bg.hex(),
+            'activityBarTop.activeBorder': semantic.accent.hex(),
+            'activityBarTopBadge.background': semantic.accent.hex(),
+            'activityBarTopBadge.foreground': contrastFg.hex(),
+
+            // Activity Bar (Bottom position)
+            'activityBarBottom.foreground': semantic.fg.hex(),
+            'activityBarBottom.inactiveForeground': semantic.fgMuted.hex(),
+            'activityBarBottom.activeForeground': semantic.fg.hex(),
+            'activityBarBottom.background': (bordered ? semantic.bgElevated : semantic.bg).hex(),
+            'activityBarBottom.border': bordered ? semantic.fgMuted.hex() + alpha.faint : semantic.bg.hex(),
+            'activityBarBottom.activeBorder': semantic.accent.hex(),
+            'activityBarBottomBadge.background': semantic.accent.hex(),
+            'activityBarBottomBadge.foreground': contrastFg.hex(),
+
             // ================================================================
             // Sidebar
             // ================================================================
