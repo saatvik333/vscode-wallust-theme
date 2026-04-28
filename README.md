@@ -79,14 +79,14 @@ The extension monitors `~/.cache/matugen/vscode-colors` and `~/.cache/matugen/vs
 ### Theme not updating automatically?
 
 1. Check that matugen is generating files to `~/.cache/matugen/`
-2. Verify the `colors` file contains 16 hex colors
+2. Verify the `vscode-colors` file contains 16 hex colors
 3. Try `Matugen Theme: Clear Cache` then `Matugen Theme: Update Theme`
 4. Check the Output panel (View → Output → select "Matugen Theme") for errors
 
 ### Colors look wrong?
 
 1. Ensure your matugen templates match the ones in this repo's `examples/matugen-templates/` folder
-2. The `colors.json` file is optional but provides better background/foreground colors
+2. The `vscode-colors.json` file is optional but provides better background/foreground colors
 3. Try regenerating with `matugen`
 
 ### Extension not activating?

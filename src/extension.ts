@@ -1,6 +1,6 @@
 /**
  * Matugen Theme Extension
- * 
+ *
  * Architecture:
  * 1. Hash-based caching - Only regenerate themes when colors actually change
  * 2. Multi-strategy file watching - Combines chokidar + polling fallback
@@ -22,8 +22,6 @@ import template from './template';
 // ============================================================================
 // Types
 // ============================================================================
-
-
 
 interface CacheState {
     colorsHash: string;
@@ -86,16 +84,16 @@ class ThemeManager {
         // Register commands
         context.subscriptions.push(
             vscode.commands.registerCommand('matugenTheme.update', () => this.forceUpdate()),
-            vscode.commands.registerCommand('matugenTheme.clearCache', () => this.clearCache())
+            vscode.commands.registerCommand('matugenTheme.clearCache', () => this.clearCache()),
         );
 
         // Setup configuration listener
         context.subscriptions.push(
-            vscode.workspace.onDidChangeConfiguration(event => {
+            vscode.workspace.onDidChangeConfiguration((event) => {
                 if (event.affectsConfiguration('matugenTheme')) {
                     this.handleConfigChange();
                 }
-            })
+            }),
         );
 
         // Initial sync after short delay to not block activation
@@ -123,7 +121,7 @@ class ThemeManager {
     private createStatusBarItem(): void {
         this.statusBarItem = vscode.window.createStatusBarItem(
             vscode.StatusBarAlignment.Right,
-            100
+            100,
         );
         this.statusBarItem.command = 'matugenTheme.update';
         this.statusBarItem.tooltip = 'Matugen Theme - Click to update';
@@ -143,7 +141,9 @@ class ThemeManager {
                 break;
             case 'error':
                 this.statusBarItem.text = '$(error) Matugen';
-                this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+                this.statusBarItem.backgroundColor = new vscode.ThemeColor(
+                    'statusBarItem.errorBackground',
+                );
                 this.statusBarItem.show();
                 setTimeout(() => this.updateStatusBar('idle'), 3000);
                 break;
@@ -170,7 +170,7 @@ class ThemeManager {
 
     private handleConfigChange(): void {
         const autoUpdate = this.isAutoUpdateEnabled();
-        
+
         if (autoUpdate && !this.watcher) {
             this.startWatching();
             vscode.window.showInformationMessage('Matugen Theme: Auto-update enabled');
@@ -214,7 +214,7 @@ class ThemeManager {
                 usePolling: false,
                 awaitWriteFinish: {
                     stabilityThreshold: WATCHER_STABILITY_MS,
-                    pollInterval: 100
+                    pollInterval: 100,
                 },
                 ignorePermissionErrors: true,
             });
@@ -225,7 +225,6 @@ class ThemeManager {
                 console.error('Matugen Theme: Watcher error:', error);
                 // Don't show error to user, polling fallback will handle it
             });
-
         } catch (error) {
             console.error('Matugen Theme: Failed to create watcher:', error);
             // Polling fallback will handle updates
@@ -252,7 +251,7 @@ class ThemeManager {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
-        
+
         this.debounceTimer = setTimeout(async () => {
             this.debounceTimer = null;
             console.log(`Matugen Theme: Update triggered by ${source}`);
@@ -268,7 +267,7 @@ class ThemeManager {
         try {
             const colorsContent = await fsPromises.readFile(matugenColorsPath, 'utf-8');
             let jsonContent = '';
-            
+
             try {
                 jsonContent = await fsPromises.readFile(matugenColorsJsonPath, 'utf-8');
             } catch {
@@ -307,13 +306,13 @@ class ThemeManager {
 
     private async isCacheValid(): Promise<{ valid: boolean; currentHash: string | null }> {
         const currentHash = await this.computeColorsHash();
-        
+
         if (!currentHash) {
             return { valid: false, currentHash: null };
         }
 
         const cacheState = await this.loadCacheState();
-        
+
         if (!cacheState) {
             return { valid: false, currentHash };
         }
@@ -352,7 +351,7 @@ class ThemeManager {
 
         // Check cache validity
         const { valid, currentHash } = await this.isCacheValid();
-        
+
         if (valid) {
             console.log('Matugen Theme: Cache is valid, skipping regeneration');
             this.lastKnownHash = currentHash;
@@ -392,7 +391,7 @@ class ThemeManager {
 
             // Load and validate colors
             const colors = await this.loadColors();
-            
+
             // Compute hash for caching
             const currentHash = await this.computeColorsHash();
 
@@ -406,17 +405,16 @@ class ThemeManager {
             }
 
             this.updateStatusBar('success');
-            
+
             if (showFeedback) {
                 vscode.window.showInformationMessage('Matugen Theme: Themes updated successfully!');
             }
 
             return { success: true, cached: false };
-
         } catch (error) {
             const err = error instanceof Error ? error : new Error(String(error));
             this.updateStatusBar('error');
-            
+
             if (showFeedback) {
                 this.showError(err);
             } else {
@@ -424,7 +422,6 @@ class ThemeManager {
             }
 
             return { success: false, cached: false, error: err };
-
         } finally {
             this.isGenerating = false;
         }
@@ -436,7 +433,10 @@ class ThemeManager {
         // Generate all theme content first
         const themes: Array<{ fileName: string; content: string }> = [
             { fileName: 'matugen.json', content: JSON.stringify(template(colors, false), null, 4) },
-            { fileName: 'matugen-bordered.json', content: JSON.stringify(template(colors, true), null, 4) },
+            {
+                fileName: 'matugen-bordered.json',
+                content: JSON.stringify(template(colors, true), null, 4),
+            },
         ];
 
         // Write to temp files first, then rename (atomic operation)
@@ -484,19 +484,22 @@ class ThemeManager {
         if (!fs.existsSync(matugenColorsPath)) {
             throw new Error(
                 'Matugen colors file not found.\n\n' +
-                'Please run matugen to generate a color palette.\n' +
-                `Expected: ${matugenColorsPath}\n\n` +
-                'See: https://github.com/InioX/matugen'
+                    'Please run matugen to generate a color palette.\n' +
+                    `Expected: ${matugenColorsPath}\n\n` +
+                    'See: https://github.com/InioX/matugen',
             );
         }
 
         const colorsData = await fsPromises.readFile(matugenColorsPath, 'utf-8');
-        const colorStrings = colorsData.trim().split(/\s+/).filter(s => s.length > 0);
+        const colorStrings = colorsData
+            .trim()
+            .split(/\s+/)
+            .filter((s) => s.length > 0);
 
         if (colorStrings.length < REQUIRED_COLORS_COUNT) {
             throw new Error(
                 `Invalid colors file: Found ${colorStrings.length} colors, need ${REQUIRED_COLORS_COUNT}.\n` +
-                'Please regenerate with matugen.'
+                    'Please regenerate with matugen.',
             );
         }
 
@@ -543,7 +546,9 @@ class ThemeManager {
         return colors;
     }
 
-    private parseColorJson(jsonData: string): any {
+    private parseColorJson(
+        jsonData: string,
+    ): { special?: { background?: string; foreground?: string } } | null {
         try {
             return JSON.parse(jsonData);
         } catch {
@@ -551,7 +556,7 @@ class ThemeManager {
             try {
                 const fixed = jsonData
                     .split('\n')
-                    .filter(line => !line.includes('wallpaper') || !line.includes('\\'))
+                    .filter((line) => !line.includes('wallpaper') || !line.includes('\\'))
                     .join('\n');
                 return JSON.parse(fixed);
             } catch {
@@ -565,11 +570,12 @@ class ThemeManager {
     // ========================================================================
 
     private showError(error: Error): void {
-        const message = error.message.includes('Matugen') || error.message.includes('Invalid')
-            ? error.message
-            : `Matugen Theme Error: ${error.message}`;
+        const message =
+            error.message.includes('Matugen') || error.message.includes('Invalid')
+                ? error.message
+                : `Matugen Theme Error: ${error.message}`;
 
-        vscode.window.showErrorMessage(message, 'Documentation', 'Retry').then(selection => {
+        vscode.window.showErrorMessage(message, 'Documentation', 'Retry').then((selection) => {
             if (selection === 'Documentation') {
                 vscode.env.openExternal(vscode.Uri.parse('https://github.com/InioX/matugen'));
             } else if (selection === 'Retry') {

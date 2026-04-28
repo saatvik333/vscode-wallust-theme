@@ -1,10 +1,10 @@
 /**
  * Unified Theme Template with Automatic Light/Dark Detection
- * 
+ *
  * Automatically determines if the theme should be light or dark based on
  * the background color's luminance. Uses color science to ensure proper
  * contrast and readability regardless of the source palette.
- * 
+ *
  * Color Role Mapping (matugen 16-color palette):
  * - colors[0]: Background
  * - colors[1]: Red/Accent
@@ -29,17 +29,17 @@ interface SemanticColors {
     bgHighlight: Color;
     fg: Color;
     fgMuted: Color;
-    
+
     // Accents
     accent: Color;
     accentSecondary: Color;
-    
+
     // Status
     error: Color;
     warning: Color;
     success: Color;
     info: Color;
-    
+
     // Syntax
     keyword: Color;
     string: Color;
@@ -49,7 +49,7 @@ interface SemanticColors {
     variable: Color;
     comment: Color;
     operator: Color;
-    
+
     // Git
     added: Color;
     modified: Color;
@@ -90,7 +90,7 @@ function ensureContrast(fg: Color, bg: Color, minContrast = 4.5): Color {
     const bgIsLight = isLightColor(bg);
     let iterations = 0;
     const maxIterations = 20;
-    
+
     while (adjusted.contrast(bg) < minContrast && iterations < maxIterations) {
         if (bgIsLight) {
             adjusted = adjusted.darken(0.1);
@@ -99,7 +99,7 @@ function ensureContrast(fg: Color, bg: Color, minContrast = 4.5): Color {
         }
         iterations++;
     }
-    
+
     return adjusted;
 }
 
@@ -110,7 +110,7 @@ function ensureContrast(fg: Color, bg: Color, minContrast = 4.5): Color {
 function adjustForBackground(color: Color, bg: Color): Color {
     const bgIsLight = isLightColor(bg);
     const colorLuminosity = color.luminosity();
-    
+
     if (bgIsLight) {
         // On light backgrounds, ensure colors are dark enough
         if (colorLuminosity > 0.4) {
@@ -122,7 +122,7 @@ function adjustForBackground(color: Color, bg: Color): Color {
             return color.lighten(0.3).saturate(0.1);
         }
     }
-    
+
     return color;
 }
 
@@ -146,21 +146,19 @@ function highlightBackground(bg: Color, isLight: boolean): Color {
 
 function createSemanticColors(colors: Color[], isDark: boolean): SemanticColors {
     const bg = colors[0];
-    
+
     // Determine foreground - use provided or create contrasting
     let fg = colors[7];
     if (fg.contrast(bg) < 4.5) {
         fg = isDark ? Color('#e0e0e0') : Color('#1a1a1a');
     }
-    
+
     // Create muted foreground
-    const fgMuted = isDark 
-        ? fg.darken(0.3) 
-        : fg.lighten(0.4);
-    
+    const fgMuted = isDark ? fg.darken(0.3) : fg.lighten(0.4);
+
     // Adjust all accent colors for the background
     const adjustColor = (c: Color) => ensureContrast(adjustForBackground(c, bg), bg, 4.5);
-    
+
     return {
         // Base colors
         bg,
@@ -168,27 +166,27 @@ function createSemanticColors(colors: Color[], isDark: boolean): SemanticColors 
         bgHighlight: highlightBackground(bg, !isDark),
         fg,
         fgMuted,
-        
+
         // Accent colors
-        accent: adjustColor(colors[4]),           // Blue
-        accentSecondary: adjustColor(colors[6]),  // Cyan
-        
+        accent: adjustColor(colors[4]), // Blue
+        accentSecondary: adjustColor(colors[6]), // Cyan
+
         // Status colors (semantic meaning preserved)
-        error: adjustColor(colors[1]),            // Red
-        warning: adjustColor(colors[3]),          // Yellow/Orange
-        success: adjustColor(colors[2]),          // Green
-        info: adjustColor(colors[4]),             // Blue
-        
+        error: adjustColor(colors[1]), // Red
+        warning: adjustColor(colors[3]), // Yellow/Orange
+        success: adjustColor(colors[2]), // Green
+        info: adjustColor(colors[4]), // Blue
+
         // Syntax colors
-        keyword: adjustColor(colors[5]),          // Magenta/Purple
-        string: adjustColor(colors[2]),           // Green
-        number: adjustColor(colors[3]),           // Orange
-        function: adjustColor(colors[4]),         // Blue
-        type: adjustColor(colors[6]),             // Cyan
-        variable: adjustColor(colors[1]),         // Red
+        keyword: adjustColor(colors[5]), // Magenta/Purple
+        string: adjustColor(colors[2]), // Green
+        number: adjustColor(colors[3]), // Orange
+        function: adjustColor(colors[4]), // Blue
+        type: adjustColor(colors[6]), // Cyan
+        variable: adjustColor(colors[1]), // Red
         comment: fgMuted,
-        operator: adjustColor(colors[6]),         // Cyan
-        
+        operator: adjustColor(colors[6]), // Cyan
+
         // Git colors
         added: adjustColor(colors[2]),
         modified: adjustColor(colors[3]),
@@ -200,27 +198,29 @@ function createSemanticColors(colors: Color[], isDark: boolean): SemanticColors 
 function createAlphaValues(isDark: boolean): AlphaValues {
     // Slightly different alpha values for light vs dark themes
     // Light themes need less opacity for overlays to be visible
-    return isDark ? {
-        subtle: '15',
-        light: '25',
-        medium: '40',
-        strong: '60',
-        heavy: '80',
-        solid: 'cc',
-        muted: '99',
-        dimmed: '77',
-        faint: '33',
-    } : {
-        subtle: '10',
-        light: '18',
-        medium: '30',
-        strong: '50',
-        heavy: '70',
-        solid: 'cc',
-        muted: '99',
-        dimmed: '77',
-        faint: '22',
-    };
+    return isDark
+        ? {
+              subtle: '15',
+              light: '25',
+              medium: '40',
+              strong: '60',
+              heavy: '80',
+              solid: 'cc',
+              muted: '99',
+              dimmed: '77',
+              faint: '33',
+          }
+        : {
+              subtle: '10',
+              light: '18',
+              medium: '30',
+              strong: '50',
+              heavy: '70',
+              solid: 'cc',
+              muted: '99',
+              dimmed: '77',
+              faint: '22',
+          };
 }
 
 // ============================================================================
@@ -231,30 +231,30 @@ export default (colors: Color[], bordered: boolean) => {
     // Auto-detect light/dark based on background luminance
     const isDark = !isLightColor(colors[0]);
     const themeType = isDark ? 'dark' : 'light';
-    
+
     // Generate semantic colors adjusted for the background
     const semantic = createSemanticColors(colors, isDark);
     const alpha = createAlphaValues(isDark);
-    
+
     // For button/badge foregrounds, we need a contrasting color
     const contrastFg = isDark ? semantic.bg : Color('#ffffff');
 
     return {
-        'type': themeType,
-        'semanticHighlighting': true,
-        'semanticTokenColors': {
-            'enumMember': { 'foreground': semantic.type.hex() },
-            'variable.constant': { 'foreground': semantic.number.hex() },
-            'variable.defaultLibrary': { 'foreground': semantic.type.hex() },
+        type: themeType,
+        semanticHighlighting: true,
+        semanticTokenColors: {
+            enumMember: { foreground: semantic.type.hex() },
+            'variable.constant': { foreground: semantic.number.hex() },
+            'variable.defaultLibrary': { foreground: semantic.type.hex() },
         },
-        'colors': {
+        colors: {
             // ================================================================
             // Base Colors
             // ================================================================
-            'focusBorder': semantic.accent.hex() + alpha.dimmed,
-            'foreground': semantic.fg.hex(),
-            'descriptionForeground': semantic.fg.hex() + alpha.muted,
-            'errorForeground': semantic.error.hex(),
+            focusBorder: semantic.accent.hex() + alpha.dimmed,
+            foreground: semantic.fg.hex(),
+            descriptionForeground: semantic.fg.hex() + alpha.muted,
+            errorForeground: semantic.error.hex(),
             'widget.shadow': isDark ? '#00000066' : '#00000026',
             'selection.background': semantic.accent.hex() + alpha.medium,
             'icon.foreground': semantic.fg.hex(),
@@ -265,7 +265,10 @@ export default (colors: Color[], bordered: boolean) => {
             'textBlockQuote.background': semantic.bgElevated.hex(),
             'textBlockQuote.border': semantic.accent.hex() + alpha.medium,
             'textLink.foreground': semantic.accent.hex(),
-            'textLink.activeForeground': (isDark ? semantic.accent.lighten(0.2) : semantic.accent.darken(0.1)).hex(),
+            'textLink.activeForeground': (isDark
+                ? semantic.accent.lighten(0.2)
+                : semantic.accent.darken(0.1)
+            ).hex(),
             'textPreformat.foreground': semantic.string.hex(),
             'textSeparator.foreground': semantic.fgMuted.hex() + alpha.faint,
 
@@ -274,10 +277,16 @@ export default (colors: Color[], bordered: boolean) => {
             // ================================================================
             'button.background': semantic.accent.hex(),
             'button.foreground': contrastFg.hex(),
-            'button.hoverBackground': (isDark ? semantic.accent.lighten(0.1) : semantic.accent.darken(0.1)).hex(),
+            'button.hoverBackground': (isDark
+                ? semantic.accent.lighten(0.1)
+                : semantic.accent.darken(0.1)
+            ).hex(),
             'button.secondaryBackground': semantic.bgHighlight.hex(),
             'button.secondaryForeground': semantic.fg.hex(),
-            'button.secondaryHoverBackground': (isDark ? semantic.bgHighlight.lighten(0.1) : semantic.bgHighlight.darken(0.05)).hex(),
+            'button.secondaryHoverBackground': (isDark
+                ? semantic.bgHighlight.lighten(0.1)
+                : semantic.bgHighlight.darken(0.05)
+            ).hex(),
 
             // ================================================================
             // Dropdown
@@ -355,7 +364,9 @@ export default (colors: Color[], bordered: boolean) => {
             'activityBar.background': (bordered ? semantic.bgElevated : semantic.bg).hex(),
             'activityBar.foreground': semantic.fg.hex(),
             'activityBar.inactiveForeground': semantic.fgMuted.hex(),
-            'activityBar.border': bordered ? semantic.fgMuted.hex() + alpha.faint : (bordered ? semantic.bgElevated : semantic.bg).hex(),
+            'activityBar.border': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : (bordered ? semantic.bgElevated : semantic.bg).hex(),
             'activityBar.activeBorder': semantic.accent.hex(),
             'activityBarBadge.background': semantic.accent.hex(),
             'activityBarBadge.foreground': contrastFg.hex(),
@@ -365,7 +376,9 @@ export default (colors: Color[], bordered: boolean) => {
             'activityBarTop.inactiveForeground': semantic.fgMuted.hex(),
             'activityBarTop.activeForeground': semantic.fg.hex(),
             'activityBarTop.background': (bordered ? semantic.bg : semantic.bgElevated).hex(),
-            'activityBarTop.border': bordered ? semantic.fgMuted.hex() + alpha.faint : semantic.bg.hex(),
+            'activityBarTop.border': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : semantic.bg.hex(),
             'activityBarTop.activeBorder': semantic.accent.hex(),
             'activityBarTopBadge.background': semantic.accent.hex(),
             'activityBarTopBadge.foreground': contrastFg.hex(),
@@ -375,7 +388,9 @@ export default (colors: Color[], bordered: boolean) => {
             'activityBarBottom.inactiveForeground': semantic.fgMuted.hex(),
             'activityBarBottom.activeForeground': semantic.fg.hex(),
             'activityBarBottom.background': (bordered ? semantic.bgElevated : semantic.bg).hex(),
-            'activityBarBottom.border': bordered ? semantic.fgMuted.hex() + alpha.faint : semantic.bg.hex(),
+            'activityBarBottom.border': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : semantic.bg.hex(),
             'activityBarBottom.activeBorder': semantic.accent.hex(),
             'activityBarBottomBadge.background': semantic.accent.hex(),
             'activityBarBottomBadge.foreground': contrastFg.hex(),
@@ -385,7 +400,9 @@ export default (colors: Color[], bordered: boolean) => {
             // ================================================================
             'sideBar.background': (bordered ? semantic.bg : semantic.bgElevated).hex(),
             'sideBar.foreground': semantic.fg.hex() + alpha.muted,
-            'sideBar.border': bordered ? semantic.fgMuted.hex() + alpha.faint : (bordered ? semantic.bg : semantic.bgElevated).hex(),
+            'sideBar.border': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : (bordered ? semantic.bg : semantic.bgElevated).hex(),
             'sideBarTitle.foreground': semantic.fg.hex(),
             'sideBarSectionHeader.background': semantic.bg.hex(),
             'sideBarSectionHeader.foreground': semantic.fg.hex(),
@@ -412,11 +429,18 @@ export default (colors: Color[], bordered: boolean) => {
             'editorGroup.border': semantic.fgMuted.hex() + alpha.faint,
             'editorGroup.dropBackground': semantic.accent.hex() + alpha.light,
             'editorGroupHeader.noTabsBackground': semantic.bg.hex(),
-            'editorGroupHeader.tabsBackground': (bordered ? semantic.bg : semantic.bgElevated).hex(),
-            'editorGroupHeader.tabsBorder': bordered ? semantic.fgMuted.hex() + alpha.faint : (bordered ? semantic.bg : semantic.bgElevated).hex(),
+            'editorGroupHeader.tabsBackground': (bordered
+                ? semantic.bg
+                : semantic.bgElevated
+            ).hex(),
+            'editorGroupHeader.tabsBorder': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : (bordered ? semantic.bg : semantic.bgElevated).hex(),
             'tab.activeBackground': semantic.bg.hex(),
             'tab.activeForeground': semantic.fg.hex(),
-            'tab.border': bordered ? semantic.fgMuted.hex() + alpha.faint : (bordered ? semantic.bg : semantic.bgElevated).hex(),
+            'tab.border': bordered
+                ? semantic.fgMuted.hex() + alpha.faint
+                : (bordered ? semantic.bg : semantic.bgElevated).hex(),
             'tab.activeBorder': bordered ? undefined : semantic.accent.hex(),
             'tab.activeBorderTop': bordered ? semantic.accent.hex() : undefined,
             'tab.unfocusedActiveBorder': bordered ? undefined : semantic.fgMuted.hex(),
@@ -504,9 +528,11 @@ export default (colors: Color[], bordered: boolean) => {
             'editorOverviewRuler.border': semantic.fgMuted.hex() + alpha.faint,
             'editorOverviewRuler.findMatchForeground': semantic.warning.hex() + alpha.strong,
             'editorOverviewRuler.rangeHighlightForeground': semantic.accent.hex() + alpha.medium,
-            'editorOverviewRuler.selectionHighlightForeground': semantic.accent.hex() + alpha.medium,
+            'editorOverviewRuler.selectionHighlightForeground':
+                semantic.accent.hex() + alpha.medium,
             'editorOverviewRuler.wordHighlightForeground': semantic.fgMuted.hex() + alpha.medium,
-            'editorOverviewRuler.wordHighlightStrongForeground': semantic.accent.hex() + alpha.medium,
+            'editorOverviewRuler.wordHighlightStrongForeground':
+                semantic.accent.hex() + alpha.medium,
             'editorOverviewRuler.modifiedForeground': semantic.modified.hex(),
             'editorOverviewRuler.addedForeground': semantic.added.hex(),
             'editorOverviewRuler.deletedForeground': semantic.deleted.hex(),
@@ -592,8 +618,14 @@ export default (colors: Color[], bordered: boolean) => {
             // Peek View
             // ================================================================
             'peekView.border': semantic.accent.hex(),
-            'peekViewEditor.background': (isDark ? semantic.bg.darken(0.1) : semantic.bgElevated).hex(),
-            'peekViewEditorGutter.background': (isDark ? semantic.bg.darken(0.1) : semantic.bgElevated).hex(),
+            'peekViewEditor.background': (isDark
+                ? semantic.bg.darken(0.1)
+                : semantic.bgElevated
+            ).hex(),
+            'peekViewEditorGutter.background': (isDark
+                ? semantic.bg.darken(0.1)
+                : semantic.bgElevated
+            ).hex(),
             'peekViewEditor.matchHighlightBackground': semantic.warning.hex() + alpha.light,
             'peekViewEditor.matchHighlightBorder': semantic.warning.hex(),
             'peekViewResult.background': semantic.bgElevated.hex(),
@@ -703,7 +735,10 @@ export default (colors: Color[], bordered: boolean) => {
             // ================================================================
             'extensionButton.prominentForeground': contrastFg.hex(),
             'extensionButton.prominentBackground': semantic.accent.hex(),
-            'extensionButton.prominentHoverBackground': (isDark ? semantic.accent.lighten(0.1) : semantic.accent.darken(0.1)).hex(),
+            'extensionButton.prominentHoverBackground': (isDark
+                ? semantic.accent.lighten(0.1)
+                : semantic.accent.darken(0.1)
+            ).hex(),
             'extensionBadge.remoteBackground': semantic.accent.hex(),
             'extensionBadge.remoteForeground': contrastFg.hex(),
             'extensionIcon.starForeground': semantic.warning.hex(),
@@ -821,7 +856,10 @@ export default (colors: Color[], bordered: boolean) => {
             'settings.textInputBackground': (isDark ? semantic.bg.darken(0.1) : semantic.bg).hex(),
             'settings.textInputForeground': semantic.fg.hex(),
             'settings.textInputBorder': semantic.fgMuted.hex() + alpha.faint,
-            'settings.numberInputBackground': (isDark ? semantic.bg.darken(0.1) : semantic.bg).hex(),
+            'settings.numberInputBackground': (isDark
+                ? semantic.bg.darken(0.1)
+                : semantic.bg
+            ).hex(),
             'settings.numberInputForeground': semantic.fg.hex(),
             'settings.numberInputBorder': semantic.fgMuted.hex() + alpha.faint,
             'settings.focusedRowBackground': semantic.bgHighlight.hex(),
@@ -914,424 +952,436 @@ export default (colors: Color[], bordered: boolean) => {
         // ====================================================================
         // Token Colors (Syntax Highlighting)
         // ====================================================================
-        'tokenColors': [
+        tokenColors: [
             // Base
             {
-                'settings': {
-                    'background': semantic.bg.hex(),
-                    'foreground': semantic.fg.hex(),
-                }
+                settings: {
+                    background: semantic.bg.hex(),
+                    foreground: semantic.fg.hex(),
+                },
             },
             // Comments
             {
-                'name': 'Comment',
-                'scope': ['comment', 'punctuation.definition.comment'],
-                'settings': {
-                    'foreground': semantic.comment.hex() + alpha.solid,
-                    'fontStyle': 'italic',
-                }
+                name: 'Comment',
+                scope: ['comment', 'punctuation.definition.comment'],
+                settings: {
+                    foreground: semantic.comment.hex() + alpha.solid,
+                    fontStyle: 'italic',
+                },
             },
             // Strings
             {
-                'name': 'String',
-                'scope': ['string', 'string.quoted', 'string.template'],
-                'settings': {
-                    'foreground': semantic.string.hex(),
-                }
+                name: 'String',
+                scope: ['string', 'string.quoted', 'string.template'],
+                settings: {
+                    foreground: semantic.string.hex(),
+                },
             },
             {
-                'name': 'String Escape',
-                'scope': ['constant.character.escape', 'string.regexp'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'String Escape',
+                scope: ['constant.character.escape', 'string.regexp'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             // Numbers and constants
             {
-                'name': 'Number',
-                'scope': ['constant.numeric'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Number',
+                scope: ['constant.numeric'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             {
-                'name': 'Constant',
-                'scope': ['constant', 'constant.language'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Constant',
+                scope: ['constant', 'constant.language'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             {
-                'name': 'Built-in constant',
-                'scope': ['support.constant'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Built-in constant',
+                scope: ['support.constant'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             // Variables
             {
-                'name': 'Variable',
-                'scope': ['variable', 'variable.other', 'variable.other.readwrite'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                }
+                name: 'Variable',
+                scope: ['variable', 'variable.other', 'variable.other.readwrite'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                },
             },
             {
-                'name': 'Variable Property',
-                'scope': ['variable.other.property', 'meta.object-literal.key'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                }
+                name: 'Variable Property',
+                scope: ['variable.other.property', 'meta.object-literal.key'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                },
             },
             {
-                'name': 'Variable Constant',
-                'scope': ['variable.other.constant'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Variable Constant',
+                scope: ['variable.other.constant'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             {
-                'name': 'Language Variable',
-                'scope': ['variable.language'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Language Variable',
+                scope: ['variable.language'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Parameter',
-                'scope': ['variable.parameter'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Parameter',
+                scope: ['variable.parameter'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                    fontStyle: 'italic',
+                },
             },
             // Keywords
             {
-                'name': 'Keyword',
-                'scope': ['keyword', 'keyword.control'],
-                'settings': {
-                    'foreground': semantic.keyword.hex(),
-                }
+                name: 'Keyword',
+                scope: ['keyword', 'keyword.control'],
+                settings: {
+                    foreground: semantic.keyword.hex(),
+                },
             },
             {
-                'name': 'Keyword Operator',
-                'scope': ['keyword.operator'],
-                'settings': {
-                    'foreground': semantic.operator.hex(),
-                }
+                name: 'Keyword Operator',
+                scope: ['keyword.operator'],
+                settings: {
+                    foreground: semantic.operator.hex(),
+                },
             },
             {
-                'name': 'Keyword Other Unit',
-                'scope': ['keyword.other.unit'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                }
+                name: 'Keyword Other Unit',
+                scope: ['keyword.other.unit'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                },
             },
             // Storage
             {
-                'name': 'Storage',
-                'scope': ['storage', 'storage.type', 'storage.modifier'],
-                'settings': {
-                    'foreground': semantic.keyword.hex(),
-                }
+                name: 'Storage',
+                scope: ['storage', 'storage.type', 'storage.modifier'],
+                settings: {
+                    foreground: semantic.keyword.hex(),
+                },
             },
             // Functions
             {
-                'name': 'Function',
-                'scope': ['entity.name.function', 'meta.function-call'],
-                'settings': {
-                    'foreground': semantic.function.hex(),
-                }
+                name: 'Function',
+                scope: ['entity.name.function', 'meta.function-call'],
+                settings: {
+                    foreground: semantic.function.hex(),
+                },
             },
             {
-                'name': 'Function Call',
-                'scope': ['variable.function', 'support.function'],
-                'settings': {
-                    'foreground': semantic.function.hex(),
-                }
+                name: 'Function Call',
+                scope: ['variable.function', 'support.function'],
+                settings: {
+                    foreground: semantic.function.hex(),
+                },
             },
             {
-                'name': 'Support Function',
-                'scope': ['support.function.builtin'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Support Function',
+                scope: ['support.function.builtin'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             // Types and Classes
             {
-                'name': 'Type',
-                'scope': ['entity.name.type', 'entity.name.class', 'entity.name.namespace'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Type',
+                scope: ['entity.name.type', 'entity.name.class', 'entity.name.namespace'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'Type Primitive',
-                'scope': ['support.type.primitive', 'support.type.builtin'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Type Primitive',
+                scope: ['support.type.primitive', 'support.type.builtin'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'Type Parameter',
-                'scope': ['entity.name.type.parameter'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Type Parameter',
+                scope: ['entity.name.type.parameter'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Support Type',
-                'scope': ['support.type', 'support.class'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Support Type',
+                scope: ['support.type', 'support.class'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'Inherited Class',
-                'scope': ['entity.other.inherited-class'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Inherited Class',
+                scope: ['entity.other.inherited-class'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                    fontStyle: 'italic',
+                },
             },
 
             // Punctuation
             {
-                'name': 'Punctuation',
-                'scope': ['punctuation'],
-                'settings': {
-                    'foreground': semantic.fg.hex() + alpha.solid,
-                }
+                name: 'Punctuation',
+                scope: ['punctuation'],
+                settings: {
+                    foreground: semantic.fg.hex() + alpha.solid,
+                },
             },
             {
-                'name': 'Punctuation Brackets',
-                'scope': ['punctuation.definition.block', 'punctuation.section', 'meta.brace'],
-                'settings': {
-                    'foreground': semantic.fg.hex(),
-                }
+                name: 'Punctuation Brackets',
+                scope: ['punctuation.definition.block', 'punctuation.section', 'meta.brace'],
+                settings: {
+                    foreground: semantic.fg.hex(),
+                },
             },
             // Tags (HTML/XML/JSX)
             {
-                'name': 'Tag',
-                'scope': ['entity.name.tag'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                }
+                name: 'Tag',
+                scope: ['entity.name.tag'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                },
             },
             {
-                'name': 'Tag Punctuation',
-                'scope': ['punctuation.definition.tag'],
-                'settings': {
-                    'foreground': semantic.fgMuted.hex(),
-                }
+                name: 'Tag Punctuation',
+                scope: ['punctuation.definition.tag'],
+                settings: {
+                    foreground: semantic.fgMuted.hex(),
+                },
             },
             {
-                'name': 'Tag Attribute',
-                'scope': ['entity.other.attribute-name'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Tag Attribute',
+                scope: ['entity.other.attribute-name'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Tag Attribute ID',
-                'scope': ['entity.other.attribute-name.id'],
-                'settings': {
-                    'foreground': semantic.function.hex(),
-                }
+                name: 'Tag Attribute ID',
+                scope: ['entity.other.attribute-name.id'],
+                settings: {
+                    foreground: semantic.function.hex(),
+                },
             },
             // CSS
             {
-                'name': 'CSS Property',
-                'scope': ['support.type.property-name.css', 'support.type.vendored.property-name.css'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'CSS Property',
+                scope: [
+                    'support.type.property-name.css',
+                    'support.type.vendored.property-name.css',
+                ],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'CSS Property Value',
-                'scope': ['support.constant.property-value.css', 'support.constant.color.css'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'CSS Property Value',
+                scope: ['support.constant.property-value.css', 'support.constant.color.css'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             {
-                'name': 'CSS Selector',
-                'scope': ['entity.name.tag.css', 'entity.other.attribute-name.class.css'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'CSS Selector',
+                scope: ['entity.name.tag.css', 'entity.other.attribute-name.class.css'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'CSS Pseudo',
-                'scope': ['entity.other.attribute-name.pseudo-class.css', 'entity.other.attribute-name.pseudo-element.css'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'CSS Pseudo',
+                scope: [
+                    'entity.other.attribute-name.pseudo-class.css',
+                    'entity.other.attribute-name.pseudo-element.css',
+                ],
+                settings: {
+                    foreground: semantic.type.hex(),
+                    fontStyle: 'italic',
+                },
             },
             // JSON
             {
-                'name': 'JSON Key',
-                'scope': ['support.type.property-name.json'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                }
+                name: 'JSON Key',
+                scope: ['support.type.property-name.json'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                },
             },
             // Decorators
             {
-                'name': 'Decorator',
-                'scope': ['meta.decorator', 'storage.type.annotation', 'punctuation.decorator'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Decorator',
+                scope: ['meta.decorator', 'storage.type.annotation', 'punctuation.decorator'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
             // Imports
             {
-                'name': 'Import',
-                'scope': ['keyword.control.import', 'keyword.control.export', 'keyword.control.from'],
-                'settings': {
-                    'foreground': semantic.keyword.hex(),
-                }
+                name: 'Import',
+                scope: ['keyword.control.import', 'keyword.control.export', 'keyword.control.from'],
+                settings: {
+                    foreground: semantic.keyword.hex(),
+                },
             },
             {
-                'name': 'Module',
-                'scope': ['entity.name.import', 'entity.name.package', 'support.module'],
-                'settings': {
-                    'foreground': semantic.string.hex(),
-                }
+                name: 'Module',
+                scope: ['entity.name.import', 'entity.name.package', 'support.module'],
+                settings: {
+                    foreground: semantic.string.hex(),
+                },
             },
             // Markdown
             {
-                'name': 'Markdown Heading',
-                'scope': ['markup.heading', 'entity.name.section.markdown'],
-                'settings': {
-                    'foreground': semantic.variable.hex(),
-                    'fontStyle': 'bold',
-                }
+                name: 'Markdown Heading',
+                scope: ['markup.heading', 'entity.name.section.markdown'],
+                settings: {
+                    foreground: semantic.variable.hex(),
+                    fontStyle: 'bold',
+                },
             },
             {
-                'name': 'Markdown Bold',
-                'scope': ['markup.bold'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                    'fontStyle': 'bold',
-                }
+                name: 'Markdown Bold',
+                scope: ['markup.bold'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                    fontStyle: 'bold',
+                },
             },
             {
-                'name': 'Markdown Italic',
-                'scope': ['markup.italic'],
-                'settings': {
-                    'foreground': semantic.keyword.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Markdown Italic',
+                scope: ['markup.italic'],
+                settings: {
+                    foreground: semantic.keyword.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Markdown Link',
-                'scope': ['markup.underline.link', 'string.other.link'],
-                'settings': {
-                    'foreground': semantic.function.hex(),
-                }
+                name: 'Markdown Link',
+                scope: ['markup.underline.link', 'string.other.link'],
+                settings: {
+                    foreground: semantic.function.hex(),
+                },
             },
             {
-                'name': 'Markdown Code',
-                'scope': ['markup.inline.raw', 'markup.fenced_code'],
-                'settings': {
-                    'foreground': semantic.string.hex(),
-                }
+                name: 'Markdown Code',
+                scope: ['markup.inline.raw', 'markup.fenced_code'],
+                settings: {
+                    foreground: semantic.string.hex(),
+                },
             },
             {
-                'name': 'Markdown Quote',
-                'scope': ['markup.quote'],
-                'settings': {
-                    'foreground': semantic.comment.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Markdown Quote',
+                scope: ['markup.quote'],
+                settings: {
+                    foreground: semantic.comment.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Markdown List',
-                'scope': ['markup.list punctuation.definition.list', 'beginning.punctuation.definition.list'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Markdown List',
+                scope: [
+                    'markup.list punctuation.definition.list',
+                    'beginning.punctuation.definition.list',
+                ],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             // Diff
             {
-                'name': 'Diff Inserted',
-                'scope': ['markup.inserted'],
-                'settings': {
-                    'foreground': semantic.added.hex(),
-                }
+                name: 'Diff Inserted',
+                scope: ['markup.inserted'],
+                settings: {
+                    foreground: semantic.added.hex(),
+                },
             },
             {
-                'name': 'Diff Deleted',
-                'scope': ['markup.deleted'],
-                'settings': {
-                    'foreground': semantic.deleted.hex(),
-                }
+                name: 'Diff Deleted',
+                scope: ['markup.deleted'],
+                settings: {
+                    foreground: semantic.deleted.hex(),
+                },
             },
             {
-                'name': 'Diff Changed',
-                'scope': ['markup.changed'],
-                'settings': {
-                    'foreground': semantic.modified.hex(),
-                }
+                name: 'Diff Changed',
+                scope: ['markup.changed'],
+                settings: {
+                    foreground: semantic.modified.hex(),
+                },
             },
             {
-                'name': 'Diff Header',
-                'scope': ['meta.diff.header'],
-                'settings': {
-                    'foreground': semantic.function.hex(),
-                }
+                name: 'Diff Header',
+                scope: ['meta.diff.header'],
+                settings: {
+                    foreground: semantic.function.hex(),
+                },
             },
             // Invalid
             {
-                'name': 'Invalid',
-                'scope': ['invalid', 'invalid.illegal'],
-                'settings': {
-                    'foreground': semantic.error.hex(),
-                }
+                name: 'Invalid',
+                scope: ['invalid', 'invalid.illegal'],
+                settings: {
+                    foreground: semantic.error.hex(),
+                },
             },
             {
-                'name': 'Deprecated',
-                'scope': ['invalid.deprecated'],
-                'settings': {
-                    'foreground': semantic.warning.hex(),
-                    'fontStyle': 'strikethrough',
-                }
+                name: 'Deprecated',
+                scope: ['invalid.deprecated'],
+                settings: {
+                    foreground: semantic.warning.hex(),
+                    fontStyle: 'strikethrough',
+                },
             },
             // Language-specific
             {
-                'name': 'Python Self',
-                'scope': ['variable.parameter.function.language.special.self.python', 'variable.language.special.self.python'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Python Self',
+                scope: [
+                    'variable.parameter.function.language.special.self.python',
+                    'variable.language.special.self.python',
+                ],
+                settings: {
+                    foreground: semantic.type.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Rust Lifetime',
-                'scope': ['storage.modifier.lifetime.rust', 'entity.name.lifetime.rust'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                    'fontStyle': 'italic',
-                }
+                name: 'Rust Lifetime',
+                scope: ['storage.modifier.lifetime.rust', 'entity.name.lifetime.rust'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                    fontStyle: 'italic',
+                },
             },
             {
-                'name': 'Go Package',
-                'scope': ['entity.name.package.go'],
-                'settings': {
-                    'foreground': semantic.type.hex(),
-                }
+                name: 'Go Package',
+                scope: ['entity.name.package.go'],
+                settings: {
+                    foreground: semantic.type.hex(),
+                },
             },
             {
-                'name': 'Java Annotation',
-                'scope': ['storage.type.annotation.java'],
-                'settings': {
-                    'foreground': semantic.number.hex(),
-                }
+                name: 'Java Annotation',
+                scope: ['storage.type.annotation.java'],
+                settings: {
+                    foreground: semantic.number.hex(),
+                },
             },
         ],
     };
