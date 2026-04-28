@@ -4,5 +4,5 @@ node_modules
 *.vsix
 
 # Prevent changes to the blank themes
-wallust-bordered.json
-wallust.json
+matugen-bordered.json
+matugen.json

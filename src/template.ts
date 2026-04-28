@@ -5,7 +5,7 @@
  * the background color's luminance. Uses color science to ensure proper
  * contrast and readability regardless of the source palette.
  * 
- * Color Role Mapping (wallust 16-color palette):
+ * Color Role Mapping (matugen 16-color palette):
  * - colors[0]: Background
  * - colors[1]: Red/Accent
  * - colors[2]: Green

@@ -1,0 +1,28 @@
+{
+  "checksum": ":)",
+  "wallpaper": "{{ image }}",
+  "alpha": "100",
+  "special": {
+    "background": "{{ colors.background.default.hex }}",
+    "foreground": "{{ colors.on_background.default.hex }}",
+    "cursor": "{{ colors.primary.default.hex }}"
+  },
+  "colors": {
+    "color0": "{{ colors.background.default.hex }}",
+    "color1": "{{ colors.error.default.hex }}",
+    "color2": "{{ colors.secondary.default.hex }}",
+    "color3": "{{ colors.tertiary.default.hex }}",
+    "color4": "{{ colors.primary.default.hex }}",
+    "color5": "{{ colors.tertiary.default.hex }}",
+    "color6": "{{ colors.secondary_container.default.hex }}",
+    "color7": "{{ colors.on_surface_variant.default.hex }}",
+    "color8": "{{ colors.surface_variant.default.hex }}",
+    "color9": "{{ colors.error.default.hex }}",
+    "color10": "{{ colors.secondary.default.hex }}",
+    "color11": "{{ colors.tertiary.default.hex }}",
+    "color12": "{{ colors.primary.default.hex }}",
+    "color13": "{{ colors.tertiary.default.hex }}",
+    "color14": "{{ colors.primary_container.default.hex }}",
+    "color15": "{{ colors.on_background.default.hex }}"
+  }
+}

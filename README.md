@@ -1,13 +1,13 @@
-# Wallust Theme
+# Matugen Theme
 
-Visual Studio Code theme that syncs with your wallpaper palette in real time using wallust.
+Visual Studio Code theme that syncs with your wallpaper palette in real time using matugen.
 
 <div align="center">
 
-[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/saatvik333.wallust-theme?style=flat-square&label=VS+Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=saatvik333.wallust-theme)
-[![Open VSX](https://img.shields.io/open-vsx/v/saatvik333/wallust-theme?style=flat-square&label=Open+VSX&logo=eclipse-ide)](https://open-vsx.org/extension/saatvik333/wallust-theme)
-[![Downloads](https://img.shields.io/visual-studio-marketplace/d/saatvik333.wallust-theme?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=saatvik333.wallust-theme)
-[![License](https://img.shields.io/github/license/saatvik333/vscode-wallust-theme?style=flat-square)](https://github.com/saatvik333/vscode-wallust-theme/blob/master/LICENSE)
+[![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/haikalllp.matugen-theme?style=flat-square&label=VS+Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=haikalllp.matugen-theme)
+[![Open VSX](https://img.shields.io/open-vsx/v/haikalllp/matugen-theme?style=flat-square&label=Open+VSX&logo=eclipse-ide)](https://open-vsx.org/extension/haikalllp/matugen-theme)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/haikalllp.matugen-theme?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=haikalllp.matugen-theme)
+[![License](https://img.shields.io/github/license/haikalllp/vscode-matugen-theme?style=flat-square)](https://github.com/haikalllp/vscode-matugen-theme/blob/master/LICENSE)
 
 </div>
 
@@ -29,27 +29,27 @@ Visual Studio Code theme that syncs with your wallpaper palette in real time usi
 
 ## Requirements
 
-1. **Install [wallust](https://codeberg.org/explosion-mental/wallust):**
-   This extension relies on wallust for generating color palettes.
+1. **Install [matugen](https://github.com/InioX/matugen):**
+   This extension relies on matugen for generating color palettes.
 
 2. **Copy templates:**
-   Copy the templates from the [templates](./examples/wallust-templates/) directory to your wallust templates folder.
+   Copy the templates from the [templates](./examples/matugen-templates/) directory to your matugen templates folder.
 
-3. **Configure `wallust.toml`:**
-   Add these entries to generate the required color files:
+3. **Configure matugen:**
+   Set up matugen to generate the required color files:
 
    ```toml
    [templates]
-   vscode = { src = 'vscode.json', dst = '~/.cache/wallust/colors.json' }
-   vscode2 = { src = 'vscode', dst = '~/.cache/wallust/colors' }
+   vscode-colors = { src = 'vscode-colors', dst = '~/.cache/matugen/vscode-colors' }
+   vscode-colors-json = { src = 'vscode-colors.json', dst = '~/.cache/matugen/vscode-colors.json' }
    ```
 
-4. **Run wallust:**
-   Generate colors with `wallust run <image>` or let it run automatically with your wallpaper manager.
+4. **Run matugen:**
+   Generate colors with `matugen` or let it run automatically with your wallpaper manager.
 
 ## How It Works
 
-The extension monitors `~/.cache/wallust/colors` and `~/.cache/wallust/colors.json` for changes:
+The extension monitors `~/.cache/matugen/vscode-colors` and `~/.cache/matugen/vscode-colors.json` for changes:
 
 1. **File Watcher:** Primary detection using chokidar with write stabilization
 2. **Polling Fallback:** Secondary check every 5 seconds using hash comparison
@@ -60,34 +60,34 @@ The extension monitors `~/.cache/wallust/colors` and `~/.cache/wallust/colors.js
 
 | Command                       | Description                                                |
 | ----------------------------- | ---------------------------------------------------------- |
-| `Wallust Theme: Update Theme` | Force regenerate themes from current colors                |
-| `Wallust Theme: Clear Cache`  | Clear the theme cache (forces regeneration on next change) |
+| `Matugen Theme: Update Theme` | Force regenerate themes from current colors                |
+| `Matugen Theme: Clear Cache`  | Clear the theme cache (forces regeneration on next change) |
 
 ## Extension Settings
 
 | Setting                   | Default | Description                                            |
 | ------------------------- | ------- | ------------------------------------------------------ |
-| `wallustTheme.autoUpdate` | `true`  | Automatically update themes when wallust colors change |
+| `matugenTheme.autoUpdate` | `true`  | Automatically update themes when matugen colors change |
 
 ## Theme Variants
 
-- **Wallust:** Clean theme without borders (auto light/dark based on background)
-- **Wallust Bordered:** Theme with subtle borders between panels (auto light/dark based on background)
+- **Matugen:** Clean theme without borders (auto light/dark based on background)
+- **Matugen Bordered:** Theme with subtle borders between panels (auto light/dark based on background)
 
 ## Troubleshooting
 
 ### Theme not updating automatically?
 
-1. Check that wallust is generating files to `~/.cache/wallust/`
+1. Check that matugen is generating files to `~/.cache/matugen/`
 2. Verify the `colors` file contains 16 hex colors
-3. Try `Wallust Theme: Clear Cache` then `Wallust Theme: Update Theme`
-4. Check the Output panel (View → Output → select "Wallust Theme") for errors
+3. Try `Matugen Theme: Clear Cache` then `Matugen Theme: Update Theme`
+4. Check the Output panel (View → Output → select "Matugen Theme") for errors
 
 ### Colors look wrong?
 
-1. Ensure your wallust templates match the ones in this repo's `examples/wallust-templates/` folder
+1. Ensure your matugen templates match the ones in this repo's `examples/matugen-templates/` folder
 2. The `colors.json` file is optional but provides better background/foreground colors
-3. Try regenerating with `wallust run <your-wallpaper>`
+3. Try regenerating with `matugen`
 
 ### Extension not activating?
 
@@ -98,7 +98,7 @@ The extension activates after VS Code startup completes. Check:
 
 ## Technical Details
 
-- **Cache location:** `<extension>/themes/.wallust-theme-cache.json`
+- **Cache location:** `<extension>/themes/.matugen-theme-cache.json`
 - **Debounce delay:** 500ms (prevents rapid regeneration)
 - **Polling interval:** 5 seconds (fallback detection)
 - **Write stabilization:** 300ms (waits for file writes to complete)
